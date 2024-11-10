@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+require_relative "ray"
+
 module Rt
   class Camera
     attr_reader :image_width, :image_height, :aspect_ratio, :center,
@@ -36,7 +39,7 @@ module Rt
           ray_direction = pixel_center - self.center
 
           ray = Ray.new(origin: self.center, direction: ray_direction)
-          pixel_color = Rt.ray_color(ray, world)
+          pixel_color = Rt.color_for_ray(ray, world)
 
           #pixel_color =
           #Color[
