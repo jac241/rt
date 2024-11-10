@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'benchmark/ips'
 
-require_relative "rt"
+require_relative "lib/rt"
 
 def suppress_output
   original_stdout, original_stderr = $stdout.clone, $stderr.clone

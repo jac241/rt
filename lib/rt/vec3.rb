@@ -21,17 +21,22 @@ module Rt
     def to_unit_vector
       self / self.length
     end
+
+    def self.random(min: 0.0, max: 1.0)
+      self[rand(min..max), rand(min..max), rand(min..max)]
+    end
+
+    def self.random_unit_vector
+      while true
+        p = self.random
+        lensq = p.length_squared
+
+        if 1e-160 < lensq && lensq <= 1.0
+          return p / Math.sqrt(lensq)
+        end
+      end
+    end
   end
 
   Point3 = Vec3
-
-  class Color < Vec3
-    def to_ppm
-      ir = (255.999 * x).to_i
-      ig = (255.999 * y).to_i
-      ib = (255.999 * z).to_i
-
-      "#{ir} #{ig} #{ib}"
-    end
-  end
 end

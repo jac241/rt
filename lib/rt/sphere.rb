@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "./hit_record"
+
 module Rt
   Sphere = Data.define(:center, :radius) do
 

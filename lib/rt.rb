@@ -16,8 +16,11 @@ module Rt
       Sphere.new(center: Point3[0, -100.5, -1], radius: 100),
     ])
 
-    camera = Camera.new(image_width: 400, aspect_ratio: 16.0 / 9.0)
+    camera = Camera.new(image_width: 200, aspect_ratio: 16.0 / 9.0)
     camera.render(world)
   end
 end
+
+# monkey patch range
+Range.include Rt::RangeExtensions
 
