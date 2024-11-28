@@ -47,7 +47,7 @@ module Rt
     def render(world, out_file:)
       # pool = Concurrent::FixedThreadPool.new(5)
       #colors = Parallel.map((0...image_height).to_a, in_threads: 10) do |j|
-      colors = (0...image_height).flat_map do |j|
+      (0...image_height).flat_map do |j|
         (0...image_width).map do |i|
           pixel_color = Color.new(0.0, 0.0, 0.0)
 
@@ -62,12 +62,6 @@ module Rt
           (pixel_samples_scale * pixel_color).to_ppm
         end
       end
-
-      #out_file.puts "P3"
-      #out_file.puts "#{image_width} #{image_height}"
-      #out_file.puts "255"
-
-      #out_file.puts colors.join("\n")
     end
 
     private
@@ -96,7 +90,7 @@ module Rt
 
     unit_direction = ray.direction.to_unit_vector
     a = 0.5 * (unit_direction.y + 1.0)
-    return (1.0 - a)*Color.new(1.0, 1.0, 1.0) + a*Color.new(0.5, 0.7, 1.0)
+    return ((1.0 - a)*Color.new(1.0, 1.0, 1.0)).add!(a*Color.new(0.5, 0.7, 1.0))
   end
 
   def self.sample_square

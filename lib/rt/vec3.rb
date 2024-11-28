@@ -33,6 +33,8 @@ module Rt
       @x += other.x
       @y += other.y
       @z += other.z
+
+      self
     end
 
     # Vector subtraction
