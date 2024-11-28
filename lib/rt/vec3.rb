@@ -1,29 +1,128 @@
 module Rt
-  class Vec3 < Vector
-    def initialize(array)
-      raise "Trying to construct Vec3 with array with size #{array.size}" unless array.size == 3
+  class Vec3
+    attr_accessor :x, :y, :z
 
-      super(array.map(&:to_f))
+    def initialize(x = 0, y = 0, z = 0)
+      @x = x.to_f
+      @y = y.to_f
+      @z = z.to_f
     end
 
-    def x = @elements[0]
-    def y = @elements[1]
-    def z = @elements[2]
+    # Class method to create new instance using []
+    #def self.[](*args)
+      #raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 3)" unless args.length == 3
+      #new(*args)
+    #end
 
+    # Coercion method for operations with other types
+    def coerce(other)
+      case other
+      when Numeric
+        [self, other]
+      else
+        raise TypeError, "#{self.class} can't be coerced into #{other.class}"
+      end
+    end
+
+    # Vector addition
+    def +(other)
+      self.class.new(@x + other.x, @y + other.y, @z + other.z)
+    end
+
+    def add!(other)
+      @x += other.x
+      @y += other.y
+      @z += other.z
+    end
+
+    # Vector subtraction
+    def -(other)
+      self.class.new(@x - other.x, @y - other.y, @z - other.z)
+    end
+
+    def -@
+      self.class.new(-@x, -@y, -@z)
+    end
+
+    # Multiplication - handles both scalar and vector multiplication
+    def *(other)
+      case other
+      when Numeric
+        self.class.new(@x * other, @y * other, @z * other)
+      when self.class
+        self.class.new(@x * other.x, @y * other.y, @z * other.z)
+      else
+        raise TypeError, "can't multiply Vector3 with #{other.class}"
+      end
+    end
+
+    # Scalar division
+    def /(scalar)
+      raise ZeroDivisionError, "division by zero" if scalar == 0
+      self.class.new(@x / scalar, @y / scalar, @z / scalar)
+    end
+
+    # Dot product
+    def dot(other)
+      @x * other.x + @y * other.y + @z * other.z
+    end
+
+    # Cross product
+    def cross(other)
+      self.class.new(
+        @y * other.z - @z * other.y,
+        @z * other.x - @x * other.z,
+        @x * other.y - @y * other.x
+      )
+    end
+
+    # Square of the magnitude
     def length_squared
-      @elements[0] * @elements[0] + @elements[1] * @elements[1] + @elements[2] * @elements[2]
+      @x * @x + @y * @y + @z * @z
     end
 
+    # Magnitude (length) of the vector
     def length
       Math.sqrt(length_squared)
     end
+    alias magnitude length
 
-    def to_unit_vector
-      self / self.length
+    # Normalize the vector (create unit vector)
+    def normalize
+      len = length
+      return self.class.new(0, 0, 0) if len == 0
+      self.class.new(@x / len, @y / len, @z / len)
+    end
+
+    # Distance between two vectors
+    def distance(other)
+      (self - other).length
+    end
+
+    # Angle between two vectors (in radians)
+    def angle(other)
+      Math.acos(dot(other) / (length * other.length))
+    end
+
+    # String representation
+    def to_s
+      "(#{@x}, #{@y}, #{@z})"
+    end
+
+    # Equality comparison
+    def ==(other)
+      @x == other.x && @y == other.y && @z == other.z
+    end
+
+    alias to_unit_vector normalize
+
+    # Zero vector
+    def self.zero
+      new(0, 0, 0)
     end
 
     def self.random(min: 0.0, max: 1.0)
-      self[rand(min..max), rand(min..max), rand(min..max)]
+      new(rand(min..max), rand(min..max), rand(min..max))
     end
 
     def self.random_unit_vector

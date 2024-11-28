@@ -9,7 +9,6 @@ module Rt
       oc = center - ray.origin
 
       a = ray.direction.dot(ray.direction) 
-      #b = -2.0 * ray.direction.dot(oc)
       h = ray.direction.dot(oc)
       c = oc.length_squared - radius*radius
       discriminant = h*h - a*c
