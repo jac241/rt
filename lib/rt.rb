@@ -17,10 +17,10 @@ module Rt
   def self.main(args = ARGV)
     options = parse_options(args)
 
-    material_ground = Materials::Lambertian.new(Color.new(0.8, 0.8, 0.0))
+    material_ground = Materials::Lambertian.new(Color.new(0.75, 0.75, 0.75))
     material_center = Materials::Lambertian.new(Color.new(0.1, 0.2, 0.5))
-    material_left = Materials::Metal.new(Color.new(0.8, 0.8, 0.8))
-    material_right = Materials::Metal.new(Color.new(0.8, 0.6, 0.2))
+    material_left = Materials::Metal.new(albedo: Color.new(0.8, 0.8, 0.8), fuzz: 0.0)
+    material_right = Materials::Metal.new(albedo: Color.new(0.8, 0.6, 0.2), fuzz: 0.5)
 
     world = HittableList.new([
       Sphere.new(center: Point3.new(0, -100.5, -1), radius: 100, material: material_ground),
@@ -38,7 +38,7 @@ module Rt
     colors = camera.render(world, out_file: nil)
 
     path = Pathname.new(options.output_path)
-    $stderr.puts "Writing image to path: #{path}"
+    #$stderr.puts "Writing image to path: #{path}"
 
     File.open(path, "w") do |f|
       f.puts "P3"

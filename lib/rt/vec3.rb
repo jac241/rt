@@ -31,14 +31,6 @@ module Rt
       self.class.new(@x + other.x, @y + other.y, @z + other.z)
     end
 
-    def add!(other)
-      @x += other.x
-      @y += other.y
-      @z += other.z
-
-      self
-    end
-
     # Vector subtraction
     def -(other)
       self.class.new(@x - other.x, @y - other.y, @z - other.z)

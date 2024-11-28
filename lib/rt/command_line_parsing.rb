@@ -28,9 +28,9 @@ module Rt
 
       parser.on("--show",) { |v| options[:show_output] = v }
       parser.on("-o", "--output_path PATH") { |v| options[:output_path] = v }
-      parser.on("--image_width WIDTH") { |v| options[:image_width] = v }
+      parser.on("--image_width WIDTH") { |v| options[:image_width] = v.to_i }
       parser.on("--aspect_ratio RATIO") { |v| options[:aspect_ratio] = eval(v) }
-      parser.on("--samples_per_pixel SAMPLES") { |v| options[:samples_per_pixel] = v }
+      parser.on("--samples_per_pixel SAMPLES") { |v| options[:samples_per_pixel] = v.to_i }
 
       parser.parse!(args)
 

@@ -81,12 +81,17 @@ module Rt
 
     if (hit_record = world.maybe_hit(ray:, ray_tmin: 0.001, ray_tmax: Float::INFINITY))
       scattering = hit_record.material.scatter(ray_in: ray, hit_record: hit_record)
-      return scattering.attenuation * color_for_ray(scattering.ray, depth - 1, world)
+
+      if scattering.absorbed?
+        return Color.new(0.0, 0.0, 0.0)
+      else
+        return scattering.attenuation * color_for_ray(scattering.ray, depth - 1, world)
+      end
     end
 
     unit_direction = ray.direction.to_unit_vector
     a = 0.5 * (unit_direction.y + 1.0)
-    return ((1.0 - a)*Color.new(1.0, 1.0, 1.0)).add!(a*Color.new(0.5, 0.7, 1.0))
+    return (1.0 - a)*Color.new(1.0, 1.0, 1.0) + a*Color.new(0.5, 0.7, 1.0)
   end
 
   def self.sample_square
