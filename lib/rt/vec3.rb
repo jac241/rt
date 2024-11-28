@@ -1,5 +1,7 @@
 module Rt
   class Vec3
+    NEAR_ZERO_THRESHOLD = 1e-8
+
     attr_accessor :x, :y, :z
 
     def initialize(x = 0, y = 0, z = 0)
@@ -121,6 +123,10 @@ module Rt
     # Zero vector
     def self.zero
       new(0, 0, 0)
+    end
+
+    def near_zero?
+      x.abs < NEAR_ZERO_THRESHOLD && y.abs < NEAR_ZERO_THRESHOLD && z.abs < NEAR_ZERO_THRESHOLD
     end
 
     def self.random(min: 0.0, max: 1.0)

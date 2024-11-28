@@ -80,12 +80,8 @@ module Rt
     return Color.new(0.0, 0.0, 0.0) if depth <= 0
 
     if (hit_record = world.maybe_hit(ray:, ray_tmin: 0.001, ray_tmax: Float::INFINITY))
-      direction = hit_record.normal + Vec3.random_unit_vector
-      return 0.2 * color_for_ray(
-        Ray.new(origin: hit_record.point, direction:),
-        depth - 1,
-        world,
-      )
+      scattering = hit_record.material.scatter(ray_in: ray, hit_record: hit_record)
+      return scattering.attenuation * color_for_ray(scattering.ray, depth - 1, world)
     end
 
     unit_direction = ray.direction.to_unit_vector

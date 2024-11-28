@@ -3,7 +3,7 @@
 require_relative "./hit_record"
 
 module Rt
-  Sphere = Data.define(:center, :radius) do
+  Sphere = Data.define(:center, :radius, :material) do
 
     def maybe_hit(ray:, ray_tmin:, ray_tmax:)
       oc = center - ray.origin
@@ -26,6 +26,7 @@ module Rt
       result = HitRecord.new
       result.t = root
       result.point = ray.at(root)
+      result.material = material
 
       outward_normal = (result.point - center) / radius
       result.set_face_normal(ray:, outward_normal:)

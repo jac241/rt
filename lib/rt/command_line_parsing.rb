@@ -20,6 +20,7 @@ module Rt
         super(show_output:, output_path:, image_width:, aspect_ratio:, samples_per_pixel:)
       end
     end
+
     def parse_options(args)
       options = {}
 

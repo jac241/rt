@@ -10,16 +10,23 @@ require_relative "rt/hittable_list"
 require_relative "rt/sphere"
 require_relative "rt/camera"
 require_relative "rt/range_extensions"
+require_relative 'rt/materials'
 
 module Rt
   extend CommandLineParsing
   def self.main(args = ARGV)
     options = parse_options(args)
 
+    material_ground = Materials::Lambertian.new(Color.new(0.8, 0.8, 0.0))
+    material_center = Materials::Lambertian.new(Color.new(0.1, 0.2, 0.5))
+    material_left = Materials::Metal.new(Color.new(0.8, 0.8, 0.8))
+    material_right = Materials::Metal.new(Color.new(0.8, 0.6, 0.2))
+
     world = HittableList.new([
-      Sphere.new(center: Point3.new(0, 0, -1), radius: 0.5),
-      Sphere.new(center: Point3.new(2, 0.75, -1.25), radius: 1.5),
-      Sphere.new(center: Point3.new(0, -100.5, -1), radius: 100),
+      Sphere.new(center: Point3.new(0, -100.5, -1), radius: 100, material: material_ground),
+      Sphere.new(center: Point3.new(0, 0, -1.2), radius: 0.5, material: material_center),
+      Sphere.new(center: Point3.new(-1.0, 0.0, -1.0), radius: 0.5, material: material_left),
+      Sphere.new(center: Point3.new(1.0, 0.0, -1.0), radius: 0.5, material: material_right),
     ])
 
     camera = Camera.new(
