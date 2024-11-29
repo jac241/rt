@@ -1,14 +1,12 @@
 # frozen_string_literal: true
 
-require_relative 'lib/rt'
-
-# options = %w[--show --image_width 200 --aspect_ratio 1.0 --samples_per_pixel 5]
+require_relative "lib/rt"
 
 random_spheres =
   (-11...11).flat_map do |a|
     (-11..11).map do |b|
       choose_mat = rand
-      center = Rt::Point3.new(a + 0.9*rand, 0.2, b+0.9*rand)
+      center = Rt::Point3.new(a + 0.9 * rand, 0.2, b + 0.9 * rand)
 
       if (center - Rt::Point3.new(4.0, 0.2, 0.0)).length > 0.9
         if choose_mat < 0.8
@@ -62,7 +60,7 @@ world = Rt::HittableList.new(
       radius: 1.0,
       material: Rt::Materials::Metal.new(albedo: Rt::Color.new(0.7, 0.6, 0.5), fuzz: 0.0)
     ),
-    *random_spheres.compact,
+    *random_spheres.compact
   ]
 )
 
@@ -70,7 +68,7 @@ options = Rt::CommandLineParsing::Options.new(
   show_output: true,
   output_path: "./world.ppm",
   image_width: 1920,
-  aspect_ratio: 16.0/9.0,
+  aspect_ratio: 16.0 / 9.0,
   samples_per_pixel: 100,
   max_depth: 50,
   camera_vfov: 20,

@@ -1,10 +1,8 @@
 # frozen_string_literal: true
-require "parallel"
-require "concurrent"
 
 require_relative "ray"
 require_relative "color"
-require_relative 'xor_shift_random'
+require_relative "xor_shift_random"
 
 module Rt
   class Camera
@@ -53,14 +51,14 @@ module Rt
       @w = (@lookfrom - @lookat).to_unit_vector
       @u = @vup.cross(@w).to_unit_vector
       @v = w.cross(@u)
-      
+
       viewport_u = viewport_width * u
       viewport_v = viewport_height * -v
 
       @pixel_delta_u = viewport_u / image_width
       @pixel_delta_v = viewport_v / image_height
 
-      viewport_upper_left = @center - (@focus_dist * w) - viewport_u/2 - viewport_v/2
+      viewport_upper_left = @center - (@focus_dist * w) - viewport_u / 2 - viewport_v / 2
       @pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v)
 
       defocus_radius = focus_dist * Math.tan(Rt.degrees_to_radians(@defocus_angle / 2))
@@ -68,12 +66,14 @@ module Rt
       @defocus_disk_v = @v * defocus_radius
     end
 
-    def render(world)
-      # pool = Concurrent::FixedThreadPool.new(5)
-      #colors = Parallel.map((0...image_height).to_a, in_threads: 10) do |j|
+    def render(world, parallel: false)
+      Thread.current[:random] = XORShiftRandom.new
 
-      # parallel_render(world)
-      serial_render(world)
+      if parallel
+        parallel_render(world)
+      else
+        serial_render(world)
+      end
     end
 
     def serial_render(world)
@@ -94,9 +94,7 @@ module Rt
       end
     end
 
-    def parallel_render(world)
-      # result = Array.new(image_height * image_width)
-      pixels = Concurrent::Array.new(image_height * image_width, 0)
+    def parallel_render(world) # can be slightly faster for high quality scenes
       indices = image_height.times.flat_map { |j| image_width.times.map { |i| [i, j] } }
       thread_count = 10
 
@@ -107,7 +105,6 @@ module Rt
           indices_for_thread.map do |(i, j)|
             pixel_color = Color.new(0.0, 0.0, 0.0)
 
-            result_index = i + j*image_width
             samples_per_pixel.times do
               pixel_color += Rt.color_for_ray(
                 make_sample_ray(i, j),
@@ -120,7 +117,7 @@ module Rt
         end
       end
       threads.each(&:join)
-      threads.lazy.map(&:value).reduce(&:+)
+      threads.map(&:value).reduce(&:+)
     end
 
     private
@@ -130,9 +127,9 @@ module Rt
       pixel_sample = pixel00_loc + (
           ((pixel_loc_i + offset.x) * pixel_delta_u) +
           ((pixel_loc_j + offset.y) * pixel_delta_v)
-      )
+        )
       Ray.new(
-        origin: defocus_angle <= 0 ? center : defocus_disk_sample,
+        origin: (defocus_angle <= 0) ? center : defocus_disk_sample,
         direction: pixel_sample - center
       )
     end
@@ -167,19 +164,17 @@ module Rt
         else
           attenuations.append scattering.attenuation
           stack.push([scattering.ray, depth - 1])
-          # return scattering.attenuation * color_for_ray(scattering.ray, depth - 1, world)
         end
       else
         unit_direction = starting_ray.direction.to_unit_vector
         a = 0.5 * (unit_direction.y + 1.0)
-        attenuations.append (1.0 - a)*Color.new(1.0, 1.0, 1.0) + a*Color.new(0.5, 0.7, 1.0)
+        attenuations.append (1.0 - a) * Color.new(1.0, 1.0, 1.0) + a * Color.new(0.5, 0.7, 1.0)
         break
       end
     end
 
     attenuations.reduce(&:*)
   end
-
 
   def self.sample_square
     Vec3.new(rand - 0.5, rand - 0.5, 0.0)
@@ -196,11 +191,9 @@ module Rt
   end
 
   def self.random_vec3_in_unit_disk
-    while true
+    loop do
       p = Vec3.new(rand(-1.0..1.0), rand(-1.0..1.0), 0.0)
       return p if p.length_squared < 1
     end
   end
-
 end
-

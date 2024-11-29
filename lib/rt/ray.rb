@@ -8,7 +8,7 @@ module Rt
     end
 
     def at(t)
-      origin + t*direction
+      origin + t * direction
     end
   end
 

@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
-require_relative "./hit_record"
+require_relative "hit_record"
 
 module Rt
   Sphere = Data.define(:center, :radius, :material) do
-
     def maybe_hit(ray:, ray_tmin:, ray_tmax:)
       oc = center - ray.origin
 
-      a = ray.direction.dot(ray.direction) 
+      a = ray.direction.dot(ray.direction)
       h = ray.direction.dot(oc)
-      c = oc.length_squared - radius*radius
-      discriminant = h*h - a*c
+      c = oc.length_squared - radius * radius
+      discriminant = h * h - a * c
 
       return nil if discriminant < 0
 
@@ -33,6 +32,5 @@ module Rt
 
       result
     end
-
   end
 end

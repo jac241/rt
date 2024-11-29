@@ -19,8 +19,8 @@ module Rt
     end
 
     def rand
-      self.state = Rand.xorshift(self.state)
-      self.state * UNI_64BIT_INV
+      self.state = Rand.xorshift(state)
+      state * UNI_64BIT_INV
     end
 
     def rand_range(range)

@@ -1,17 +1,11 @@
 module Rt
   module RangeExtensions
     def surrounds(item)
-      first < item < last
+      first < item && item < last
     end
 
     def clamp(value)
-      if value < min
-        min
-      elsif value > max
-        max
-      else
-        value
-      end
+      value.clamp(min, max)
     end
   end
 end

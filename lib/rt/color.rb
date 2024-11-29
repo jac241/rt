@@ -1,10 +1,10 @@
 require_relative "vec3"
-require_relative "range_extensions.rb"
+require_relative "range_extensions"
 
 module Rt
   class Color < Vec3
     def to_ppm
-      intensity = 000..0.999
+      intensity = 0o00..0.999
 
       r = Rt.linear_to_gamma(x)
       g = Rt.linear_to_gamma(y)

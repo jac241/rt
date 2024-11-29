@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require_relative 'xor_shift_random'
+
+require_relative "xor_shift_random"
 module Rt
   class Vec3
     NEAR_ZERO_THRESHOLD = 1e-8
@@ -7,16 +8,10 @@ module Rt
     attr_accessor :x, :y, :z
 
     def initialize(x, y, z)
-      @x = x #.to_f
-      @y = y #.to_f
-      @z = z #.to_f
+      @x = x # .to_f
+      @y = y # .to_f
+      @z = z # .to_f
     end
-
-    # Class method to create new instance using []
-    #def self.[](*args)
-      #raise ArgumentError, "wrong number of arguments (given #{args.length}, expected 3)" unless args.length == 3
-      #new(*args)
-    #end
 
     # Coercion method for operations with other types
     def coerce(other)
@@ -55,9 +50,9 @@ module Rt
     end
 
     # Scalar division
-    def /(scalar)
+    def /(other)
       # raise ZeroDivisionError, "division by zero" if scalar == 0
-      self.class.new(@x / scalar, @y / scalar, @z / scalar)
+      self.class.new(@x / other, @y / other, @z / other)
     end
 
     # Dot product
@@ -78,12 +73,13 @@ module Rt
     def length_squared
       @x * @x + @y * @y + @z * @z
     end
+
     #
     # Magnitude (length) of the vector
     def length
       Math.sqrt(length_squared)
     end
-    alias magnitude length
+    alias_method :magnitude, :length
 
     # Normalize the vector (create unit vector)
     def normalize
@@ -112,7 +108,7 @@ module Rt
       @x == other.x && @y == other.y && @z == other.z
     end
 
-    alias to_unit_vector normalize
+    alias_method :to_unit_vector, :normalize
 
     # Zero vector
     def self.zero
@@ -124,17 +120,17 @@ module Rt
     end
 
     def self.random(min: 0.0, max: 1.0)
-      # r = Thread.current[:random] ||= XORShiftRandom.new
-      # new(r.rand_range(min..max), r.rand_range(min..max), r.rand_range(min..max))
-      new(rand(min..max), rand(min..max), rand(min..max))
+      rng = Thread.current[:random]
+      new(rng.rand_range(min..max), rng.rand_range(min..max), rng.rand_range(min..max))
+      # new(rand(min..max), rand(min..max), rand(min..max))
     end
 
     def self.random_unit_vector
-      while true
-        p = self.random
+      loop do
+        p = random
         lensq = p.length_squared
 
-        if 1e-160 < lensq && lensq <= 1.0
+        if lensq > 1e-160 && lensq <= 1.0
           return p / Math.sqrt(lensq)
         end
       end

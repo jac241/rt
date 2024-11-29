@@ -5,7 +5,7 @@ module Rt
     attr_reader :objects
 
     def initialize(objects = nil)
-      @objects = objects || Array.new
+      @objects = objects || []
     end
 
     def <<(object)
