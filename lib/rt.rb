@@ -15,8 +15,8 @@ require_relative 'rt/materials'
 
 module Rt
   extend CommandLineParsing
-  def self.main(args = ARGV, world: nil)
-    options = parse_options(args)
+  def self.main(args = ARGV, options: nil, world: nil)
+    options = parse_options(args) unless options
 
     unless world
       material_ground = Materials::Lambertian.new(Color.new(0.8, 0.8, 0))
@@ -38,15 +38,15 @@ module Rt
       image_width: options.image_width,
       aspect_ratio: options.aspect_ratio,
       samples_per_pixel: options.samples_per_pixel,
-      vfov: 40,
-      lookfrom: Point3.new(-2, 2, 1),
-      lookat: Point3.new(0, 0, -1),
+      vfov: options.camera_vfov,
+      lookfrom: options.camera_lookfrom,
+      lookat: options.camera_lookat,
       vup: Vec3.new(0, 1, 0),
-      defocus_angle: 1.0,
-      focus_dist: 1
+      defocus_angle: options.camera_defocus_angle,
+      focus_dist: options.camera_focus_dist,
     )
 
-    colors = camera.render(world, out_file: nil)
+    colors = camera.render(world)
 
     path = Pathname.new(options.output_path)
     #$stderr.puts "Writing image to path: #{path}"

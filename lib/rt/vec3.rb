@@ -1,13 +1,14 @@
+# frozen_string_literal: true
 module Rt
   class Vec3
     NEAR_ZERO_THRESHOLD = 1e-8
 
     attr_accessor :x, :y, :z
 
-    def initialize(x = 0, y = 0, z = 0)
-      @x = x.to_f
-      @y = y.to_f
-      @z = z.to_f
+    def initialize(x, y, z)
+      @x = x #.to_f
+      @y = y #.to_f
+      @z = z #.to_f
     end
 
     # Class method to create new instance using []
@@ -54,7 +55,7 @@ module Rt
 
     # Scalar division
     def /(scalar)
-      raise ZeroDivisionError, "division by zero" if scalar == 0
+      # raise ZeroDivisionError, "division by zero" if scalar == 0
       self.class.new(@x / scalar, @y / scalar, @z / scalar)
     end
 

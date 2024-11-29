@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 require "parallel"
-require "concurrent-ruby"
+require "concurrent"
 
 require_relative "ray"
 require_relative "color"
@@ -67,9 +67,15 @@ module Rt
       @defocus_disk_v = @v * defocus_radius
     end
 
-    def render(world, out_file:)
+    def render(world)
       # pool = Concurrent::FixedThreadPool.new(5)
       #colors = Parallel.map((0...image_height).to_a, in_threads: 10) do |j|
+
+      # parallel_render(world)
+      serial_render(world)
+    end
+
+    def serial_render(world)
       (0...image_height).flat_map do |j|
         (0...image_width).map do |i|
           pixel_color = Color.new(0.0, 0.0, 0.0)
@@ -85,6 +91,33 @@ module Rt
           (pixel_samples_scale * pixel_color).to_ppm
         end
       end
+    end
+
+    def parallel_render(world)
+      # result = Array.new(image_height * image_width)
+      pixels = Concurrent::Array.new(image_height * image_width, 0)
+      indices = image_height.times.flat_map { |j| image_width.times.map { |i| [i, j] } }
+      thread_count = 10
+
+      threads = indices.each_slice(thread_count).map do |indices_for_thread|
+        Thread.new do
+          indices_for_thread.map do |(i, j)|
+            pixel_color = Color.new(0.0, 0.0, 0.0)
+
+            result_index = i + j*image_width
+            samples_per_pixel.times do
+              pixel_color += Rt.color_for_ray(
+                make_sample_ray(i, j),
+                max_depth,
+                world
+              )
+            end
+            (pixel_samples_scale * pixel_color).to_ppm
+          end
+        end
+      end
+      threads.each(&:join)
+      threads.lazy.map(&:value).reduce(&:+)
     end
 
     private
@@ -109,23 +142,41 @@ module Rt
 
   def self.degrees_to_radians(degrees) = degrees * Math::PI / 180
 
-  def self.color_for_ray(ray, depth, world)
-    return Color.new(0.0, 0.0, 0.0) if depth <= 0
+  def self.color_for_ray(starting_ray, max_depth, world)
+    stack = []
+    attenuations = []
+    stack.push([starting_ray, max_depth])
 
-    if (hit_record = world.maybe_hit(ray:, ray_tmin: 0.001, ray_tmax: Float::INFINITY))
-      scattering = hit_record.material.scatter(ray_in: ray, hit_record: hit_record)
+    while stack.any?
+      ray, depth = stack.pop
 
-      if scattering.absorbed?
-        return Color.new(0.0, 0.0, 0.0)
+      if depth <= 0
+        attenuations.append Color.new(0.0, 0.0, 0.0)
+        break
+      end
+
+      if (hit_record = world.maybe_hit(ray:, ray_tmin: 0.001, ray_tmax: Float::INFINITY))
+        scattering = hit_record.material.scatter(ray_in: ray, hit_record: hit_record)
+
+        if scattering.absorbed?
+          attenuations.append Color.new(0.0, 0.0, 0.0)
+          break
+        else
+          attenuations.append scattering.attenuation
+          stack.push([scattering.ray, depth - 1])
+          # return scattering.attenuation * color_for_ray(scattering.ray, depth - 1, world)
+        end
       else
-        return scattering.attenuation * color_for_ray(scattering.ray, depth - 1, world)
+        unit_direction = starting_ray.direction.to_unit_vector
+        a = 0.5 * (unit_direction.y + 1.0)
+        attenuations.append (1.0 - a)*Color.new(1.0, 1.0, 1.0) + a*Color.new(0.5, 0.7, 1.0)
+        break
       end
     end
 
-    unit_direction = ray.direction.to_unit_vector
-    a = 0.5 * (unit_direction.y + 1.0)
-    return (1.0 - a)*Color.new(1.0, 1.0, 1.0) + a*Color.new(0.5, 0.7, 1.0)
+    attenuations.reduce(&:*)
   end
+
 
   def self.sample_square
     Vec3.new(rand - 0.5, rand - 0.5, 0.0)
