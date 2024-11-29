@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require_relative 'xor_shift_random'
 module Rt
   class Vec3
     NEAR_ZERO_THRESHOLD = 1e-8
@@ -77,7 +78,7 @@ module Rt
     def length_squared
       @x * @x + @y * @y + @z * @z
     end
-
+    #
     # Magnitude (length) of the vector
     def length
       Math.sqrt(length_squared)
@@ -123,6 +124,8 @@ module Rt
     end
 
     def self.random(min: 0.0, max: 1.0)
+      # r = Thread.current[:random] ||= XORShiftRandom.new
+      # new(r.rand_range(min..max), r.rand_range(min..max), r.rand_range(min..max))
       new(rand(min..max), rand(min..max), rand(min..max))
     end
 

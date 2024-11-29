@@ -4,6 +4,7 @@ require "concurrent"
 
 require_relative "ray"
 require_relative "color"
+require_relative 'xor_shift_random'
 
 module Rt
   class Camera
@@ -101,6 +102,8 @@ module Rt
 
       threads = indices.each_slice(thread_count).map do |indices_for_thread|
         Thread.new do
+          Thread.current[:random] = XORShiftRandom.new
+
           indices_for_thread.map do |(i, j)|
             pixel_color = Color.new(0.0, 0.0, 0.0)
 
