@@ -16,7 +16,7 @@ module Rt
       aspect_ratio:,
       center: Point3.new(0.0, 0.0, 0.0),
       samples_per_pixel: 10,
-      max_depth: 50
+      max_depth: 10
     )
       @image_width = image_width
       @aspect_ratio = aspect_ratio

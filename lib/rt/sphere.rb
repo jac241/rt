@@ -25,11 +25,11 @@ module Rt
 
       result = HitRecord.new
       result.t = root
-      result.point = ray.at(root)
-      result.material = material
+      result.point = ray.at(result.t)
 
       outward_normal = (result.point - center) / radius
       result.set_face_normal(ray:, outward_normal:)
+      result.material = material
 
       result
     end
