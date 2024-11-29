@@ -21,20 +21,26 @@ module Rt
     material_center = Materials::Lambertian.new(Color.new(0.1, 0.2, 0.5))
     material_left = Materials::Dielectric.new(1.5)
     material_bubble = Materials::Dielectric.new(1.0 / 1.5)
-    material_right = Materials::Metal.new(albedo: Color.new(0.8, 0.6, 0.2), fuzz: 0.9)
+    material_right = Materials::Metal.new(albedo: Color.new(0.8, 0.6, 0.2), fuzz: 1.0)
 
     world = HittableList.new([
-      Sphere.new(center: Point3.new(0, -100.5, -1), radius: 100, material: material_ground),
-      Sphere.new(center: Point3.new(0, 0, -1.2), radius: 0.5, material: material_center),
-      Sphere.new(center: Point3.new(-1.0, 0.0, -1.0), radius: 0.5, material: material_left),
-      Sphere.new(center: Point3.new(-1.0, 0.0, -1.0), radius: 0.4, material: material_bubble),
-      Sphere.new(center: Point3.new(1.0, 0.0, -1.0), radius: 0.5, material: material_right),
+      Sphere.new(center: Point3.new(0.0, -100.5, -1.0), radius: 100, material: material_ground),
+      Sphere.new(center: Point3.new(0.0,    0.0, -1.2), radius: 0.5, material: material_center),
+      Sphere.new(center: Point3.new(-1.0,   0.0, -1.0), radius: 0.5, material: material_left),
+      Sphere.new(center: Point3.new(-1.0,   0.0, -1.0), radius: 0.4, material: material_bubble),
+      Sphere.new(center: Point3.new(1.0,    0.0, -1.0), radius: 0.5, material: material_right),
     ])
 
     camera = Camera.new(
       image_width: options.image_width,
       aspect_ratio: options.aspect_ratio,
       samples_per_pixel: options.samples_per_pixel,
+      vfov: 40,
+      lookfrom: Point3.new(-2, 2, 1),
+      lookat: Point3.new(0, 0, -1),
+      vup: Vec3.new(0, 1, 0),
+      defocus_angle: 1.0,
+      focus_dist: 1
     )
 
     colors = camera.render(world, out_file: nil)
