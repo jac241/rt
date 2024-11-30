@@ -116,12 +116,18 @@ module Rt
     end
 
     def near_zero?
-      x.abs < NEAR_ZERO_THRESHOLD && y.abs < NEAR_ZERO_THRESHOLD && z.abs < NEAR_ZERO_THRESHOLD
+      x.abs < NEAR_ZERO_THRESHOLD &&
+        y.abs < NEAR_ZERO_THRESHOLD &&
+        z.abs < NEAR_ZERO_THRESHOLD
     end
 
     def self.random(min: 0.0, max: 1.0)
       rng = Thread.current[:random]
-      new(rng.rand_range(min..max), rng.rand_range(min..max), rng.rand_range(min..max))
+      new(
+        rng.rand_range(min..max),
+        rng.rand_range(min..max),
+        rng.rand_range(min..max)
+      )
       # new(rand(min..max), rand(min..max), rand(min..max))
     end
 

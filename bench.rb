@@ -29,7 +29,9 @@ world = Rt::HittableList.new(
     Rt::Sphere.new(
       center: Rt::Point3.new(1.0, 0.0, -1.0),
       radius: 0.5,
-      material: Rt::Materials::Metal.new(albedo: Rt::Color.new(0.8, 0.6, 0.2), fuzz: 0.2)
+      material: Rt::Materials::Metal.new(
+        albedo: Rt::Color.new(0.8, 0.6, 0.2), fuzz: 0.2
+      )
     )
   ]
 )
